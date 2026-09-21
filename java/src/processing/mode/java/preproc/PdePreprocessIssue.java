@@ -8,6 +8,7 @@ public class PdePreprocessIssue {
   private final int line;
   private final int charPositionInLine;
   private final String msg;
+  private final boolean logicError;
 
   /**
    * Create a new record of an issue emitted from the preprocessor.
@@ -17,9 +18,15 @@ public class PdePreprocessIssue {
    * @param newMsg Description of the issue.
    */
   public PdePreprocessIssue(int newLine, int newCharPositionInLine, String newMsg) {
+    this(newLine, newCharPositionInLine, newMsg, false);
+  }
+
+  public PdePreprocessIssue(int newLine, int newCharPositionInLine, String newMsg,
+                            boolean newLogicError) {
     line = newLine;
     charPositionInLine = newCharPositionInLine;
     msg = newMsg;
+    logicError = newLogicError;
   }
 
   /**
@@ -49,4 +56,12 @@ public class PdePreprocessIssue {
     return msg;
   }
 
+  /**
+   * Find out if the given error is likely a logic error that should be caught during preprocessing.
+   *
+   * @return Is the given error a logic error?
+   */
+  public boolean isLogicError() {
+    return logicError;
+  }
 }

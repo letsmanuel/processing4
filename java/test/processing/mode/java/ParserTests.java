@@ -50,6 +50,21 @@ public class ParserTests {
     }
   }
 
+  static void expectLogicError(final String id) {
+    try {
+      preprocess(id, res(id + ".pde"));
+      fail("Expected a logic error");
+    } catch (PdePreprocessIssueException e) {
+      assertNotNull(e.getIssue().getMsg());
+      assertEquals(true, e.getIssue().isLogicError());
+    } catch (Exception e) {
+      if (!e.equals(e.getCause()) && e.getCause() != null)
+        fail(e.getCause().toString());
+      else
+        fail(e.toString());
+    }
+  }
+
   static void expectRunnerException(final String id) {
     try {
       preprocess(id, res(id + ".pde"));
@@ -487,12 +502,12 @@ public class ParserTests {
 
   @Test
   public void testExpessionSizeMethod() {
-    expectGood("expressionsizemethod");
+    expectLogicError("expressionsizemethod");
   }
 
   @Test
   public void testExpessionSizeVar() {
-    expectGood("expressionsizevar");
+    expectLogicError("expressionsizevar");
   }
 
   @Test

@@ -665,6 +665,26 @@ public class PdeParseTreeListener extends ProcessingBaseListener {
    */
 
   /**
+   * <p>
+   * Allows parser rules to report logic errors without duplicating reporting code.
+   * @param ctx The context of the user-written code where the error occurred.
+   * @param message The error message to report.
+   * </p>
+   */
+  protected void reportLogicError(ParseTree ctx, String message) {
+    Token token = ((ParserRuleContext) ctx).getStart();
+
+    pdeParseTreeErrorListenerMaybe.ifPresent((listener) -> {
+      listener.onError(new PdePreprocessIssue(
+        token.getLine(),
+        token.getCharPositionInLine(),
+        message,
+        true
+      ));
+    });
+  }
+
+  /**
    * Manage parsing out a size or fullscreen call.
    *
    * <p>
@@ -691,17 +711,24 @@ public class PdeParseTreeListener extends ProcessingBaseListener {
       thisRequiresRewrite = true;
 
       boolean widthValid = sizeParamValid(argsContext.getChild(0));
+      boolean validHeight = sizeParamValid(argsContext.getChild(2));
       if (widthValid) {
         sketchWidth = argsContext.getChild(0).getText();
       } else {
         thisRequiresRewrite = false;
       }
 
-      boolean validHeight = sizeParamValid(argsContext.getChild(2));
       if (validHeight) {
         sketchHeight = argsContext.getChild(2).getText();
       } else {
         thisRequiresRewrite = false;
+      }
+
+      if (!widthValid || !validHeight) {
+        reportLogicError(
+          ctx,
+          "size() cannot be used here, see https://processing.org/reference/size_.html"
+        );
       }
 
       if (argsContext.getChildCount() > 3) {

@@ -36,6 +36,16 @@ public class ProblemFactory {
       col = 1;
     }
 
+    if (pdePreprocessIssue.isLogicError()) {
+      return new LogicProblem(
+          tab,
+          localLine,
+          message,
+          0,
+          col
+      );
+    }
+
     return new SyntaxProblem(
         tab,
         localLine,
